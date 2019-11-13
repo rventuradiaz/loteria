@@ -1,7 +1,7 @@
 # install.packages("rvest")
 library(rvest)
 
-url_initial <- "https://www.loteriasyapuestas.es/es/la-primitiva"
+url_initial <- "https://www.loteriasyapuestas.es/es/resultados/primitiva"
 
 url_mas_informacion <- url_initial %>% 
   html()
