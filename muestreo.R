@@ -144,17 +144,20 @@ total.2016.repeticiones<-apply(as.matrix(serie_numero$year.2016), 2, sum)
 total.2017.repeticiones<-apply(as.matrix(serie_numero$year.2017), 2, sum) # v6.0
 total.2018.repeticiones<-apply(as.matrix(serie_numero$year.2018), 2, sum) # v6.0
 total.2019.repeticiones<-apply(as.matrix(serie_numero$year.2019), 2, sum) # v6.0
+total.2020.repeticiones<-apply(as.matrix(serie_numero$year.2020), 2, sum) # v6.0
 
 serie_numero["perc.total"]<-NA
 serie_numero["perc.total.2016"]<-NA
 serie_numero["perc.total.2017"]<-NA
 serie_numero["perc.total.2018"]<-NA
 serie_numero["perc.total.2019"]<-NA
+serie_numero["perc.total.2020"]<-NA
 serie_numero[,"perc.total"]<-serie_numero[,"Total"]/total.repeticiones
 serie_numero[,"perc.total.2016"]<-serie_numero[,"year.2016"]/total.2016.repeticiones
 serie_numero[,"perc.total.2017"]<-serie_numero[,"year.2017"]/total.2017.repeticiones
 serie_numero[,"perc.total.2018"]<-serie_numero[,"year.2018"]/total.2018.repeticiones
 serie_numero[,"perc.total.2019"]<-serie_numero[,"year.2019"]/total.2019.repeticiones
+serie_numero[,"perc.total.2020"]<-serie_numero[,"year.2019"]/total.2020.repeticiones
 serie_numero["over.sampling"]<-NA
 
 median.serienum<-median(serie_numero$perc.total)
@@ -177,6 +180,7 @@ serie_numero[is.na(serie_numero$over.sampling.2016),"over.sampling.2016"]<-1
 q.serienum2017 <-quantile(serie_numero$perc.total.2017)
 q.serienum2018 <-quantile(serie_numero$perc.total.2018)
 q.serienum2019 <-quantile(serie_numero$perc.total.2019)
+q.serienum2020 <-quantile(serie_numero$perc.total.2020)
 
 serie_numero[,"over.sampling.2017"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>=q.serienum2017[[1]]),"over.sampling.2017"]<-1
@@ -228,6 +232,12 @@ serie_sorteos.2019 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"
 for (i in 2:49){
   serie_sorteos.2019 <- append(serie_sorteos.2019, 
                                rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2019"]*serie_numero[i,"over.sampling.2019"])))  
+}
+
+serie_sorteos.2020 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2020"]*serie_numero[1,"over.sampling.2020"]))
+for (i in 2:49){
+  serie_sorteos.2019 <- append(serie_sorteos.2020, 
+                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2020"]*serie_numero[i,"over.sampling.2020"])))  
 }
 
 # Calculate vector of quantiles as lottery follows a uniform distribution
