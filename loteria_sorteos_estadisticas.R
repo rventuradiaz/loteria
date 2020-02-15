@@ -1,4 +1,4 @@
-source("sorteos-web-scraping.R");
+source("sorteos-js-web-scraping.R");
 
 # Estadística sorteos anteriores
 estadisticasorteos <- data.frame(Numero=c(1:49)

@@ -1,6 +1,12 @@
-# install.packages("rvest")
+# install.packages("ggvis")
 library(rvest)
 library(V8)
+
+library(plyr)
+library(dplyr)
+library(ggvis)
+library(knitr)
+options(digits = 4)
 
 url_initial <- "https://www.loteriasyapuestas.es/es/resultados/primitiva"
 
@@ -16,9 +22,20 @@ numero_sorteo <- mas_informacion
 
 # url_sorteo <- paste(url_domain,numero_sorteo,sep = "")
 url_sorteo <- url_initial
-sorteos_primitiva <- url_sorteo %>% read_html()
+sorteos_primitiva <- url_sorteo %>% 
+  read_html() %>%
+  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
+  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion--primitiva"]') %>%
+  html_nodes('li')
+
 fecha_sorteo <- sorteos_primitiva %>%
-  html_nodes(xpath="/html/body/div[2]/div[2]/div[1]/div[2]/div/div[3]/div[1]/div[2]/div[2]/div[1]/div/h2") %>%
+  html_nodes('p' )
+
+write_xml(sorteos_primitiva, file = "out.xml")
+
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion-ul"]') %>%
+  html_nodes('li') %>%
   html_text()
 combinacion_ganadora <- sorteos_primitiva %>% 
   html_nodes(xpath = "/html/body/div[2]/div[2]/div[1]/div[2]/div/div[3]/div[1]/div[2]/div[2]/div[2]/div[2]/ul[2]/li") %>%
@@ -114,6 +131,7 @@ for (i in 860:1) {
  
 
 }
+
 
 sorteos_anteriores <- sorteo_anterior[,1:8] %>% as.matrix(,1:8) 
 

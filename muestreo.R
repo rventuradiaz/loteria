@@ -46,6 +46,7 @@ library(stats)
 # Findex <- 0
 
 Fibonacci <- function(N) {
+  sf <- c()
   n <- 1
   N <- as.integer(N)
   if (N < 1) {
@@ -57,10 +58,11 @@ Fibonacci <- function(N) {
   while (n <= N) {
     fn <- f1 + f2
     n <- n + 1
-    print(fn)
+    sf <- append(sf, fn)
     f1 <- f2
     f2 <- fn
   }
+  return(sf)
 }
 
 in.draw<- function(muestra, orden=6, msorteo, limInf=1){
@@ -76,12 +78,11 @@ in.draw<- function(muestra, orden=6, msorteo, limInf=1){
   return(logindraw)
 }
 
-# source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
+source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
 
 # Leer resultados del sorteo
 serie_numero<- read.table("sorteos.txt", 
                           header=TRUE)
-
 
 # ************************************************************************************************
 # Taken from "https://m$valuesianblog.wordpress.com/2016/09/05/conditional-sampling/"
@@ -133,8 +134,9 @@ targ=function(x,y){
   }
 
 Findex <- Findex + 1
-max(Fibonacci(Findex))
-set.seed(Fibonacci(Findex))
+FValue <- Fibonacci(Findex)
+seedvalue <- max(FValue)
+set.seed(seedvalue)
 
 # Create an oversample of less frequent numbers
 total.repeticiones<-apply(as.matrix(serie_numero$Total), 2, sum)
@@ -250,7 +252,7 @@ sorteo_anyo_actual <- if(semana < 40 & anyo == 2019 ) {append(serie_sorteos.2018
 sorteo_anyo_anterior <- if(semana < 40 & anyo == 2019) {serie_sorteos.2017} else {serie_sorteos.2018}
 
 #Lottery follows a uniform distribution
-T=1e4;N=1000; M=100
+T=1e4;N=2000; M=100
 vales=matrix(0,N,6) # Now, we define a matrix with six columns
 for (i in 1:N){
   repeat {
@@ -321,7 +323,9 @@ hist(as.vector(vales),breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main
 source("function_avg_timesInRaw.R")
 
 # undebug(avg_timesInRaw)
-
+k <- 0
+set_apuesta <- list()
+diff_ap <- 1e5
 repeat {
   for (i in as.list(sort(sample(seq(1, N, by=1), 1))) ){
     apuesta <- sort(vales[i,])
@@ -343,15 +347,21 @@ repeat {
     dif_rep <- as.numeric(rep_2019) - as.numeric(rep_previo)
     metadata_apuesta$difference <- dif_rep
     print(metadata_apuesta)
+    
     if (dif_rep < 0){
       below_maxdraws <- append(below_maxdraws, 1)
     } else {
       below_maxdraws <- append(below_maxdraws, 0)
     }
   }
-  if (sum(below_maxdraws)==6){
-    print(i)
-    print(apuesta)
+  k <- k+1
+  if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
+  set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
+  set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
+  if (sum(below_maxdraws)==6 | k > 1000){
+    index <- match(diff_ap, set_apuesta$diff)
+    mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
+    print(mat_apuesta[index,])
     break
   }
 }
