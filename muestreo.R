@@ -78,6 +78,13 @@ in.draw<- function(muestra, orden=6, msorteo, limInf=1){
   return(logindraw)
 }
 
+is_unique <- function(x){
+  sumprod <- table(x)
+  return(sumprod)
+}
+
+
+
 source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
 
 # Leer resultados del sorteo
@@ -366,9 +373,12 @@ repeat {
   }
   k <- k+1
   if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
-  set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
-  set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
-  if (sum(below_maxdraws)==6 | k > 1000){
+  if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
+    set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
+    set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
+  }
+    
+  if ((sum(below_maxdraws)==6 )| k > 1000){
     index <- match(diff_ap, set_apuesta$diff)
     mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
     print(mat_apuesta[index,])
