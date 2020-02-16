@@ -207,6 +207,12 @@ serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.201
 serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[3]]),"over.sampling.2019"]<-3
 serie_numero[serie_numero$perc.total.2019>q.serienum2019[[4]],"over.sampling.2019"]<-5
 
+serie_numero[,"over.sampling.2020"]<-5
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>=q.serienum2019[[1]]),"over.sampling.2020"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2019>q.serienum2020[[2]]),"over.sampling.2020"]<-2
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[3]]),"over.sampling.2020"]<-3
+serie_numero[serie_numero$perc.total.2020>q.serienum2020[[4]],"over.sampling.2019"]<-5
+
 # table(serie_numero$over.sampling.2016)
 
 # We transform the matrix to obtain six columns
@@ -261,12 +267,14 @@ hist(serie_sorteos.2018, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, m
      cex.axis=0.5, font.main=1, cex.main=0.8)
 hist(serie_sorteos.2019, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2019'), 
      cex.axis=0.5, font.main=1, cex.main=0.8)
+hist(serie_sorteos.2020, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2020'), 
+     cex.axis=0.5, font.main=1, cex.main=0.8)
 
 # OJO: Cambiar conforme cambie el año
 anyo <- as.integer(strftime(Sys.Date(), format = "%Y"))
 semana <- as.integer(strftime(Sys.Date(), format = "%V"))
-sorteo_anyo_actual <- if(semana < 40 & anyo == 2019 ) {append(serie_sorteos.2018, serie_sorteos.2019)} else {serie_sorteos.2019}
-sorteo_anyo_anterior <- if(semana < 40 & anyo == 2019) {serie_sorteos.2017} else {serie_sorteos.2018}
+sorteo_anyo_actual <- if(semana < 40 & anyo == 2020 ) {append(serie_sorteos.2019, serie_sorteos.2018)} else {serie_sorteos.2018}
+sorteo_anyo_anterior <- if(semana < 40 & anyo == 2020) {serie_sorteos.2018} else {serie_sorteos.2017}
 
 #Lottery follows a uniform distribution
 T=1e4;N=2000; M=100
@@ -372,8 +380,9 @@ repeat {
     }
   }
   k <- k+1
-  if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
+  
   if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
+    if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
     set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
     set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
   }
