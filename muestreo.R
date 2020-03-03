@@ -195,23 +195,23 @@ serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.201
 serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>q.serienum2017[[3]]),"over.sampling.2017"]<-3
 serie_numero[serie_numero$perc.total.2017>q.serienum2017[[4]],"over.sampling.2017"]<-5
 
-serie_numero[,"over.sampling.2018"]<-5
+serie_numero[,"over.sampling.2018"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>=q.serienum2018[[1]]),"over.sampling.2018"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[2]]),"over.sampling.2018"]<-2
-serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[3]]),"over.sampling.2018"]<-3
-serie_numero[serie_numero$perc.total.2018>q.serienum2018[[4]],"over.sampling.2018"]<-5
+serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[2]]),"over.sampling.2018"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[3]]),"over.sampling.2018"]<-1
+serie_numero[serie_numero$perc.total.2018>q.serienum2018[[4]],"over.sampling.2018"]<-1
 
-serie_numero[,"over.sampling.2019"]<-5
+serie_numero[,"over.sampling.2019"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>=q.serienum2019[[1]]),"over.sampling.2019"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[2]]),"over.sampling.2019"]<-2
-serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[3]]),"over.sampling.2019"]<-3
-serie_numero[serie_numero$perc.total.2019>q.serienum2019[[4]],"over.sampling.2019"]<-5
+serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[2]]),"over.sampling.2019"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[3]]),"over.sampling.2019"]<-1
+serie_numero[serie_numero$perc.total.2019>q.serienum2019[[4]],"over.sampling.2019"]<-1
 
-serie_numero[,"over.sampling.2020"]<-5
+serie_numero[,"over.sampling.2020"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>=q.serienum2019[[1]]),"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2019>q.serienum2020[[2]]),"over.sampling.2020"]<-2
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[3]]),"over.sampling.2020"]<-3
-serie_numero[serie_numero$perc.total.2020>q.serienum2020[[4]],"over.sampling.2019"]<-5
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2019>q.serienum2020[[2]]),"over.sampling.2020"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[3]]),"over.sampling.2020"]<-1
+serie_numero[serie_numero$perc.total.2020>q.serienum2020[[4]],"over.sampling.2019"]<-1
 
 # table(serie_numero$over.sampling.2016)
 
@@ -249,12 +249,14 @@ for (i in 2:49){
 
 serie_sorteos.2020 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2020"]*serie_numero[1,"over.sampling.2020"]))
 for (i in 2:49){
-  serie_sorteos.2019 <- append(serie_sorteos.2020, 
+  serie_sorteos.2020 <- append(serie_sorteos.2020, 
                                rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2020"]*serie_numero[i,"over.sampling.2020"])))  
 }
 
 # Calculate vector of quantiles as lottery follows a uniform distribution
 par(mfcol=c(2,3), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
+# par(mfcol=c(1,1), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
+
 
 
 hist(serie_sorteos, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','todos')

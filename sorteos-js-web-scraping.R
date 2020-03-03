@@ -21,6 +21,9 @@ resultados_sorteos_primitiva <- read_html("loterias.html") %>%
   as.integer() %>%
   matrix(ncol = 6, byrow = TRUE)
 
+  resultados_sorteos_primitiva <- resultados_sorteos_primitiva[seq(1,nrow(resultados_sorteos_primitiva),2),]
+
+
 fecha_sorteos_primitiva <- read_html("loterias.html") %>%
   html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
   html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
