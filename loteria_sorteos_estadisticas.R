@@ -27,6 +27,8 @@ for (i in (1:49)){
   
   }
 
+
+
 # Año 2015:
 sorteos.2015 <- grepl("2015",sorteo_anterior[,"V9"])
 sorteo <- sorteo_anterior[sorteos.2015,c(1:6)]
@@ -106,17 +108,17 @@ for (i in (1:49)){
 }
 
 # Año 2021:
-sorteos.2021 <- grepl("2021",sorteo_anterior[,"V9"])
-sorteo <- sorteo_anterior[sorteos.2021,c(1:6)]
-# View(sorteo)
-for (i in (1:49)){
-  ensorteo <- c(FALSE)
-  # Para cada ocurrencia del sorteo:
-  for (j in 1:ncol(sorteo)){
-    ensorteo <- append(ensorteo, sorteo[,c(j)] %in% i  )
-  }
-  estadisticasorteos[estadisticasorteos$Numero==i,"year.2021"] <- sum(ensorteo)
-}
+# sorteos.2021 <- grepl("2021",sorteo_anterior[,"V9"])
+# sorteo <- sorteo_anterior[sorteos.2021,c(1:6)]
+# # View(sorteo)
+# for (i in (1:49)){
+#   ensorteo <- c(FALSE)
+#   # Para cada ocurrencia del sorteo:
+#   for (j in 1:ncol(sorteo)){
+#     ensorteo <- append(ensorteo, sorteo[,c(j)] %in% i  )
+#   }
+#   estadisticasorteos[estadisticasorteos$Numero==i,"year.2021"] <- sum(ensorteo)
+# }
 
 write.table(estadisticasorteos, file = "sorteos.txt", 
             row.names=FALSE, sep = "\t")

@@ -164,7 +164,7 @@ serie_numero[,"perc.total.2016"]<-serie_numero[,"year.2016"]/total.2016.repetici
 serie_numero[,"perc.total.2017"]<-serie_numero[,"year.2017"]/total.2017.repeticiones
 serie_numero[,"perc.total.2018"]<-serie_numero[,"year.2018"]/total.2018.repeticiones
 serie_numero[,"perc.total.2019"]<-serie_numero[,"year.2019"]/total.2019.repeticiones
-serie_numero[,"perc.total.2020"]<-serie_numero[,"year.2019"]/total.2020.repeticiones
+serie_numero[,"perc.total.2020"]<-serie_numero[,"year.2020"]/total.2020.repeticiones
 serie_numero["over.sampling"]<-NA
 
 median.serienum<-median(serie_numero$perc.total)
@@ -354,26 +354,34 @@ k <- 0
 set_apuesta <- list()
 diff_ap <- 1e5
 repeat {
+  # Select one sample
   for (i in as.list(sort(sample(seq(1, N, by=1), 1))) ){
     apuesta <- sort(vales[i,])
   }
+  
+  # Define an array to flag whether a number in bet has more appereances than last year
   below_maxdraws <- c()
   
   for (i in c(1:length(apuesta))){
     metadata_apuesta <- list()
     metadata_apuesta$apuesta <- list(apuesta)
+    # Select bet element
     compo <- apuesta[i]
     metadata_apuesta$seleccion <- compo
-    # print(compo)
-    rep_2019 <- avg_timesInRaw(x = compo, year = "2019")
+    # Get the average time element appears in draw last year
+    rep_last_year <- avg_timesInRaw(x = compo, year = as.integer(strftime(Sys.Date(), format = "%Y"))-1 )
+    
     metadata_apuesta$rep_2019 <- rep_2019
-    # print(rep_2019)
-    rep_previo <- avg_timesInRaw( x = compo)*as.integer(strftime(Sys.Date(), format = "%V"))/52
-    metadata_apuesta$rep_previo <- rep_previo
-    # print(rep_previo)
-    dif_rep <- as.numeric(rep_2019) - as.numeric(rep_previo)
+    
+    # Get the average occurence an element appear in draw in current year
+    rep_current_year <- avg_timesInRaw( x = compo) 
+    
+    metadata_apuesta$rep_current_year <- rep_current_year
+    
+    # Calculate difference between last and current year
+    dif_rep <- as.numeric(rep_current_year) - (as.numeric(rep_last_year)/52.0)*as.integer(strftime(Sys.Date(), format = "%V"))
+    
     metadata_apuesta$difference <- dif_rep
-    print(metadata_apuesta)
     
     if (dif_rep < 0){
       below_maxdraws <- append(below_maxdraws, 1)
@@ -381,6 +389,7 @@ repeat {
       below_maxdraws <- append(below_maxdraws, 0)
     }
   }
+  
   k <- k+1
   
   if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
@@ -392,9 +401,10 @@ repeat {
   if ((sum(below_maxdraws)==6 )| k > 1000){
     index <- match(diff_ap, set_apuesta$diff)
     mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
-    print(mat_apuesta[index,])
+    bet <- sort(mat_apuesta[index,])
     break
   }
 }
 
-
+cat("Apuesta", sep = "\n")
+cat(bet, sep = "\n")
