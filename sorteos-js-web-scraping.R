@@ -13,8 +13,8 @@ system("./phantomjs scrape_loterias.js")
 
 # url_sorteo <- paste(url_domain,numero_sorteo,sep = "")
 resultados_sorteos_primitiva <- read_html("loterias.html") %>%
-  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
-  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__primitiva"]') %>%
   html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion--primitiva"]') %>%
   html_nodes('li') %>%
   html_text() %>%
@@ -25,21 +25,22 @@ resultados_sorteos_primitiva <- read_html("loterias.html") %>%
 
 
 fecha_sorteos_primitiva <- read_html("loterias.html") %>%
-  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
-  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__primitiva"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__cabecera--primitiva"]') %>%
   html_nodes(xpath = '//*[@class="c-resultado-sorteo__fecha"]') %>%
   html_text()
 
 complementario_sorteos_primitiva <- read_html("loterias.html") %>%
-  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
-  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__complementario"]') %>%
   html_nodes(xpath = '//*[@class="c-resultado-sorteo__complementario-li--primitiva"]') %>%
   html_text() %>%
   as.integer()
 
 reintegro_sorteos_primitiva <- read_html("loterias.html") %>%
-  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
-  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  html_nodes(xpath = '//*[@class="c-resultado-sorteo__reintegro"]') %>%
   html_nodes(xpath = '//*[@class="c-resultado-sorteo__reintegro-li--primitiva"]') %>%
   html_text() %>%
   as.integer()
