@@ -38,13 +38,13 @@
 #   version 6.4.1 20/08/2019: Se modifica nuevamente la ponderación Q4(5), Q3(3), Q1(2), Q1(1)
 #   version 6.5.0 Se obtienen mínimos y máximos locales y se definen muestros basados en varias distribuciones normales, basados
 #   en https://stackoverflow.com/a/6836924
+#   version 6.6.0: Usar 
 # **************************************************************************
 
 
 library(stats)
 
 source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
-
  # Findex <- 0
 
 Fibonacci <- function(N) {
@@ -244,6 +244,10 @@ for (i in 2:49){
                               serie_numero[i,"Total"]*serie_numero[i,"over.sampling"]) ) 
 }
 
+# v6,6,0: Crear todos los sorteos anteriores
+lastYear <- format(Sys.Date(),"%Y")
+
+
 serie_sorteos.2016 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2016"]*serie_numero[1,"over.sampling.2016"]))
 for (i in 2:49){
   serie_sorteos.2016 <- append(serie_sorteos.2016, 
@@ -314,7 +318,8 @@ hist(serie_sorteos.2022, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, m
 anyo <- as.integer(strftime(Sys.Date(), format = "%Y"))
 semana <- as.integer(strftime(Sys.Date(), format = "%V"))
 sorteo_anyo_actual <- if(semana < 40 & anyo == 2022 ) {append(serie_sorteos.2021, serie_sorteos.2020)} else {serie_sorteos.2022}
-sorteo_anyo_anterior <- if(semana < 40 & anyo == 2022) {serie_sorteos.2020} else {serie_sorteos.2021}
+# sorteo_anyo_anterior <- if(semana < 40 & anyo == 2022) {serie_sorteos.2020} else {serie_sorteos.2021}
+sorteo_anyo_anterior <-serie_sorteos
 
 #Lottery follows a uniform distribution
 T=1e4;N=2000; M=100
@@ -386,6 +391,8 @@ hist(as.vector(vales),breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main
      cex.axis=0.5, font.main=1, cex.main=0.8)
 
 source("function_avg_timesInRaw.R")
+source("src/fnc_check_bet.R")
+
 
 # undebug(avg_timesInRaw)
 k <- 0
@@ -394,7 +401,7 @@ diff_ap <- 1e5
 repeat {
   # Select one sample
   for (i in as.list(sort(sample(seq(1, N, by=1), 1))) ){
-    apuesta <- sort(vales[i,])
+    if(checkBetIsDistinct(vales[i,]))apuesta <- sort(vales[i,])
   }
   
   # Define an array to flag whether a number in bet has more appereances than last year

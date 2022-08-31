@@ -10,9 +10,11 @@ estadisticasorteos <- data.frame(Numero=c(1:49)
                                  , year.2019 = rep(0,49)
                                  , year.2020 = rep(0,49)
                                  , year.2021 = rep(0,49)
+                                 , year.2022 = rep(0,49)
                                  )
-sorteos.2015 <- grepl("2015",sorteo_anterior[,"V9"])
-sorteo <- sorteo_anterior[sorteos.2015,c(1:6)]
+
+# sorteos.2015 <- grepl("2015",sorteo_anterior[,"V9"])
+# sorteo <- sorteo_anterior[sorteos.2015,c(1:6)]
 
 # En total:
 sorteo <- sorteo_anterior[,c(1:6)]
@@ -108,17 +110,30 @@ for (i in (1:49)){
 }
 
 # Año 2021:
-# sorteos.2021 <- grepl("2021",sorteo_anterior[,"V9"])
-# sorteo <- sorteo_anterior[sorteos.2021,c(1:6)]
-# # View(sorteo)
-# for (i in (1:49)){
-#   ensorteo <- c(FALSE)
-#   # Para cada ocurrencia del sorteo:
-#   for (j in 1:ncol(sorteo)){
-#     ensorteo <- append(ensorteo, sorteo[,c(j)] %in% i  )
-#   }
-#   estadisticasorteos[estadisticasorteos$Numero==i,"year.2021"] <- sum(ensorteo)
-# }
+sorteos.2021 <- grepl("2021",sorteo_anterior[,"V9"])
+sorteo <- sorteo_anterior[sorteos.2021,c(1:6)]
+# View(sorteo)
+for (i in (1:49)){
+  ensorteo <- c(FALSE)
+  # Para cada ocurrencia del sorteo:
+  for (j in 1:ncol(sorteo)){
+    ensorteo <- append(ensorteo, sorteo[,c(j)] %in% i  )
+  }
+  estadisticasorteos[estadisticasorteos$Numero==i,"year.2021"] <- sum(ensorteo)
+}
+
+# Año 2022:
+sorteos.2022 <- grepl("2022",sorteo_anterior[,"V9"])
+sorteo <- sorteo_anterior[sorteos.2022,c(1:6)]
+# View(sorteo)
+for (i in (1:49)){
+  ensorteo <- c(FALSE)
+  # Para cada ocurrencia del sorteo:
+  for (j in 1:ncol(sorteo)){
+    ensorteo <- append(ensorteo, sorteo[,c(j)] %in% i  )
+  }
+  estadisticasorteos[estadisticasorteos$Numero==i,"year.2022"] <- sum(ensorteo)
+}
 
 write.table(estadisticasorteos, file = "sorteos.txt", 
             row.names=FALSE, sep = "\t")
