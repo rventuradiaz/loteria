@@ -43,7 +43,9 @@
 
 library(stats)
 
-# Findex <- 0
+source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
+
+ # Findex <- 0
 
 Fibonacci <- function(N) {
   sf <- c()
@@ -85,7 +87,6 @@ is_unique <- function(x){
 
 
 
-source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
 
 # Leer resultados del sorteo
 serie_numero<- read.table("sorteos.txt", 
@@ -152,6 +153,8 @@ total.2017.repeticiones<-apply(as.matrix(serie_numero$year.2017), 2, sum) # v6.0
 total.2018.repeticiones<-apply(as.matrix(serie_numero$year.2018), 2, sum) # v6.0
 total.2019.repeticiones<-apply(as.matrix(serie_numero$year.2019), 2, sum) # v6.0
 total.2020.repeticiones<-apply(as.matrix(serie_numero$year.2020), 2, sum) # v6.0
+total.2021.repeticiones<-apply(as.matrix(serie_numero$year.2021), 2, sum) # v6.0
+total.2022.repeticiones<-apply(as.matrix(serie_numero$year.2022), 2, sum) # v6.0
 
 serie_numero["perc.total"]<-NA
 serie_numero["perc.total.2016"]<-NA
@@ -159,12 +162,16 @@ serie_numero["perc.total.2017"]<-NA
 serie_numero["perc.total.2018"]<-NA
 serie_numero["perc.total.2019"]<-NA
 serie_numero["perc.total.2020"]<-NA
+serie_numero["perc.total.2021"]<-NA
+serie_numero["perc.total.2022"]<-NA
 serie_numero[,"perc.total"]<-serie_numero[,"Total"]/total.repeticiones
 serie_numero[,"perc.total.2016"]<-serie_numero[,"year.2016"]/total.2016.repeticiones
 serie_numero[,"perc.total.2017"]<-serie_numero[,"year.2017"]/total.2017.repeticiones
 serie_numero[,"perc.total.2018"]<-serie_numero[,"year.2018"]/total.2018.repeticiones
 serie_numero[,"perc.total.2019"]<-serie_numero[,"year.2019"]/total.2019.repeticiones
 serie_numero[,"perc.total.2020"]<-serie_numero[,"year.2020"]/total.2020.repeticiones
+serie_numero[,"perc.total.2021"]<-serie_numero[,"year.2021"]/total.2021.repeticiones
+serie_numero[,"perc.total.2022"]<-serie_numero[,"year.2022"]/total.2022.repeticiones
 serie_numero["over.sampling"]<-NA
 
 median.serienum<-median(serie_numero$perc.total)
@@ -188,6 +195,8 @@ q.serienum2017 <-quantile(serie_numero$perc.total.2017)
 q.serienum2018 <-quantile(serie_numero$perc.total.2018)
 q.serienum2019 <-quantile(serie_numero$perc.total.2019)
 q.serienum2020 <-quantile(serie_numero$perc.total.2020)
+q.serienum2021 <-quantile(serie_numero$perc.total.2021)
+q.serienum2022 <-quantile(serie_numero$perc.total.2022)
 
 serie_numero[,"over.sampling.2017"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>=q.serienum2017[[1]]),"over.sampling.2017"]<-1
@@ -208,10 +217,22 @@ serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.201
 serie_numero[serie_numero$perc.total.2019>q.serienum2019[[4]],"over.sampling.2019"]<-1
 
 serie_numero[,"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>=q.serienum2019[[1]]),"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2019>q.serienum2020[[2]]),"over.sampling.2020"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>=q.serienum2020[[1]]),"over.sampling.2020"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[2]]),"over.sampling.2020"]<-1
 serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[3]]),"over.sampling.2020"]<-1
 serie_numero[serie_numero$perc.total.2020>q.serienum2020[[4]],"over.sampling.2019"]<-1
+
+serie_numero[,"over.sampling.2021"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>=q.serienum2021[[1]]),"over.sampling.2021"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>q.serienum2021[[2]]),"over.sampling.2021"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>q.serienum2021[[3]]),"over.sampling.2021"]<-1
+serie_numero[serie_numero$perc.total.2021>q.serienum2020[[4]],"over.sampling.2021"]<-1
+
+serie_numero[,"over.sampling.2022"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2021>=q.serienum2022[[1]]),"over.sampling.2022"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2022>q.serienum2022[[2]]),"over.sampling.2022"]<-1
+serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2022>q.serienum2022[[3]]),"over.sampling.2022"]<-1
+serie_numero[serie_numero$perc.total.2022>q.serienum2022[[4]],"over.sampling.2022"]<-1
 
 # table(serie_numero$over.sampling.2016)
 
@@ -253,8 +274,20 @@ for (i in 2:49){
                                rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2020"]*serie_numero[i,"over.sampling.2020"])))  
 }
 
+serie_sorteos.2021 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2021"]*serie_numero[1,"over.sampling.2021"]))
+for (i in 2:49){
+  serie_sorteos.2021 <- append(serie_sorteos.2021, 
+                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2021"]*serie_numero[i,"over.sampling.2021"])))  
+}
+
+serie_sorteos.2022 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2022"]*serie_numero[1,"over.sampling.2022"]))
+for (i in 2:49){
+  serie_sorteos.2022 <- append(serie_sorteos.2022, 
+                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2022"]*serie_numero[i,"over.sampling.2022"])))  
+}
+
 # Calculate vector of quantiles as lottery follows a uniform distribution
-par(mfcol=c(2,3), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
+par(mfcol=c(2,4), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
 # par(mfcol=c(1,1), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
 
 
@@ -271,12 +304,17 @@ hist(serie_sorteos.2019, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, m
      cex.axis=0.5, font.main=1, cex.main=0.8)
 hist(serie_sorteos.2020, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2020'), 
      cex.axis=0.5, font.main=1, cex.main=0.8)
+hist(serie_sorteos.2021, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2021'), 
+     cex.axis=0.5, font.main=1, cex.main=0.8)
+hist(serie_sorteos.2022, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2022'), 
+     cex.axis=0.5, font.main=1, cex.main=0.8)
+
 
 # OJO: Cambiar conforme cambie el año
 anyo <- as.integer(strftime(Sys.Date(), format = "%Y"))
 semana <- as.integer(strftime(Sys.Date(), format = "%V"))
-sorteo_anyo_actual <- if(semana < 40 & anyo == 2020 ) {append(serie_sorteos.2019, serie_sorteos.2018)} else {serie_sorteos.2018}
-sorteo_anyo_anterior <- if(semana < 40 & anyo == 2020) {serie_sorteos.2018} else {serie_sorteos.2017}
+sorteo_anyo_actual <- if(semana < 40 & anyo == 2022 ) {append(serie_sorteos.2021, serie_sorteos.2020)} else {serie_sorteos.2022}
+sorteo_anyo_anterior <- if(semana < 40 & anyo == 2022) {serie_sorteos.2020} else {serie_sorteos.2021}
 
 #Lottery follows a uniform distribution
 T=1e4;N=2000; M=100

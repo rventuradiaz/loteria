@@ -1,4 +1,5 @@
-# install.packages("ggvis")
+# install.packages("V8")
+library(xml2)
 library(rvest)
 library(V8)
 
@@ -23,11 +24,16 @@ numero_sorteo <- mas_informacion
 # url_sorteo <- paste(url_domain,numero_sorteo,sep = "")
 url_sorteo <- url_initial
 sorteos_primitiva <- url_sorteo %>% 
-  read_html() %>%
-  html_nodes(xpath = '//*[@class="portal-seccion-resultados"]') %>%
-  html_nodes(xpath = '//*[@class="r-resultados-buscador"]') %>%
-  html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion--primitiva"]') %>%
-  html_nodes('li')
+  read_html() 
+# %>%
+#   html_elements(xpath = '//*[@class="c-resultado-sorteo__combinacion-li--primitiva"]') %>%
+  # html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  # html_nodes(xpath = '//*[@class="c-resultado-sorteo__primitiva"]') %>%
+  # html_nodes(xpath = '//*[@class="c-resultados-buscador__primitiva c-resultado-sorteo--primitiva"]') %>%
+  # html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion--primitiva"]') %>%
+  # html_elements('li')
+
+sorteos_primitiva %>% html_nodes(xpath = '//*[@class="c-resultado-sorteo__combinacion-li--primitiva"]')
 
 fecha_sorteo <- sorteos_primitiva %>%
   html_nodes('p' )

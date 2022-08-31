@@ -50,8 +50,7 @@ n_sorteos <- nrow(resultados_sorteos_primitiva)
 
 
 for (i in n_sorteos:1) {
-
-
+# i<-1
     sorteo <- data.frame(resultados_sorteos_primitiva[i,1]
            , resultados_sorteos_primitiva[i,2]
            , resultados_sorteos_primitiva[i,3]
@@ -67,13 +66,13 @@ for (i in n_sorteos:1) {
     
    if (!(fecha_sorteos_primitiva[[i]] %in%(sorteo_anterior$V9))) {
      sorteo_anterior <- rbind(sorteo_anterior, sorteo)}else{
-       break}
+       next}
  
 
 }
 
 
-sorteos_anteriores <- sorteo_anterior[,1:8] %>% as.matrix(,1:8) 
+sorteos_anteriores <-  as.matrix(sorteo_anterior[,1:8],1:8) 
 
 saveRDS(sorteos_anteriores, file="sorteos-anteriores.rds")
 
