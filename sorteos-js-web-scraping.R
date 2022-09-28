@@ -6,6 +6,10 @@ library(ggvis)
 library(knitr)
 options(digits = 4)
 
+if(!exists("sorteo_anterior")) {
+  sorteo_anterior <- readRDS(file = "sorteoAnterior.rds")
+}
+
 # Let phantomJS scrape techstars, output is written to techstars.html
 system("./phantomjs scrape_loterias.js")
 
@@ -71,6 +75,7 @@ for (i in n_sorteos:1) {
 
 }
 
+saveRDS(sorteo_anterior, file="sorteoAnterior.rds")
 
 sorteos_anteriores <-  as.matrix(sorteo_anterior[,1:8],1:8) 
 

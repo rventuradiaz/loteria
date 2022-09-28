@@ -43,9 +43,11 @@
 
 
 library(stats)
-
+cPath <- getwd()
+source(paste(cPath,"/src/fnc_send_email.R",sep = ""))
 source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
- # Findex <- 0
+if(!exists("Findex")) Findex <- readRDS(file = "findexNumber.rds") 
+
 
 Fibonacci <- function(N) {
   sf <- c()
@@ -141,7 +143,10 @@ targ=function(x,y){
         
   }
 
+
 Findex <- Findex + 1
+saveRDS(Findex,file = "findexNumber.rds")
+
 FValue <- Fibonacci(Findex)
 seedvalue <- max(FValue)
 set.seed(seedvalue)
@@ -296,23 +301,23 @@ par(mfcol=c(2,4), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
 
 
 
-hist(serie_sorteos, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','todos')
-     ,cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2016, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2016'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2017, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2017'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2018, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2018'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2019, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2019'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2020, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2020'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2021, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2021'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-hist(serie_sorteos.2022, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2022'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
-
+# hist(serie_sorteos, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','todos')
+#      ,cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2016, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2016'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2017, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2017'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2018, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2018'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2019, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2019'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2020, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2020'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2021, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2021'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(serie_sorteos.2022, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2022'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
+# 
 
 # OJO: Cambiar conforme cambie el año
 anyo <- as.integer(strftime(Sys.Date(), format = "%Y"))
@@ -387,11 +392,11 @@ for (i in 1:N){
 #      in.draw(muestra=as.vector(vales[i,]), orden=3, sorteos_anteriores, limInf = 2)             
 #   ) 
 
-hist(as.vector(vales),breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','muestra'), 
-     cex.axis=0.5, font.main=1, cex.main=0.8)
+# hist(as.vector(vales),breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','muestra'), 
+#      cex.axis=0.5, font.main=1, cex.main=0.8)
 
 source("function_avg_timesInRaw.R")
-source("src/fnc_check_bet.R")
+source(paste(cPath,"/src/fnc_check_bet.R",sep = ""))
 
 
 # undebug(avg_timesInRaw)
@@ -399,57 +404,66 @@ k <- 0
 set_apuesta <- list()
 diff_ap <- 1e5
 repeat {
-  # Select one sample
-  for (i in as.list(sort(sample(seq(1, N, by=1), 1))) ){
-    if(checkBetIsDistinct(vales[i,]))apuesta <- sort(vales[i,])
-  }
-  
-  # Define an array to flag whether a number in bet has more appereances than last year
-  below_maxdraws <- c()
-  
-  for (i in c(1:length(apuesta))){
-    metadata_apuesta <- list()
-    metadata_apuesta$apuesta <- list(apuesta)
-    # Select bet element
-    compo <- apuesta[i]
-    metadata_apuesta$seleccion <- compo
-    # Get the average time element appears in draw last year
-    rep_last_year <- avg_timesInRaw(x = compo, year = as.integer(strftime(Sys.Date(), format = "%Y"))-1 )
-    
-    metadata_apuesta$rep_2019 <- rep_2019
-    
-    # Get the average occurence an element appear in draw in current year
-    rep_current_year <- avg_timesInRaw( x = compo) 
-    
-    metadata_apuesta$rep_current_year <- rep_current_year
-    
-    # Calculate difference between last and current year
-    dif_rep <- as.numeric(rep_current_year) - (as.numeric(rep_last_year)/52.0)*as.integer(strftime(Sys.Date(), format = "%V"))
-    
-    metadata_apuesta$difference <- dif_rep
-    
-    if (dif_rep < 0){
-      below_maxdraws <- append(below_maxdraws, 1)
-    } else {
-      below_maxdraws <- append(below_maxdraws, 0)
+    repeat {
+    # Select one sample
+    for (i in as.list(sort(sample(seq(1, N, by=1), 1))) ){
+      if(checkBetIsDistinct(vales[i,]))apuesta <- sort(vales[i,])
     }
-  }
-  
-  k <- k+1
-  
-  if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
-    if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
-    set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
-    set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
-  }
     
-  if ((sum(below_maxdraws)==6 )| k > 1000){
-    index <- match(diff_ap, set_apuesta$diff)
-    mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
-    bet <- sort(mat_apuesta[index,])
-    break
-  }
+    # Define an array to flag whether a number in bet has more appereances than last year
+    below_maxdraws <- c()
+    
+    for (i in c(1:length(apuesta))){
+      metadata_apuesta <- list()
+      metadata_apuesta$apuesta <- list(apuesta)
+      # Select bet element
+      compo <- apuesta[i]
+      metadata_apuesta$seleccion <- compo
+      # Get the average time element appears in draw last year
+      rep_last_year <- avg_timesInRaw(x = compo, year = as.integer(strftime(Sys.Date(), format = "%Y"))-1 )
+      
+      if(!exists("rep_2019")) rep_2019 <- readRDS(file = "rep2019.rds")
+      
+      metadata_apuesta$rep_2019 <- rep_2019
+      
+      
+      # Get the average occurence an element appear in draw in current year
+      rep_current_year <- avg_timesInRaw( x = compo) 
+      
+      metadata_apuesta$rep_current_year <- rep_current_year
+      
+      # Calculate difference between last and current year
+      dif_rep <- as.numeric(rep_current_year) - (as.numeric(rep_last_year)/52.0)*as.integer(strftime(Sys.Date(), format = "%V"))
+      
+      metadata_apuesta$difference <- dif_rep
+      
+      if (dif_rep < 0){
+        below_maxdraws <- append(below_maxdraws, 1)
+      } else {
+        below_maxdraws <- append(below_maxdraws, 0)
+      }
+    }
+    
+    k <- k+1
+    
+    if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
+      if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
+      set_apuesta$apuesta <- append(set_apuesta$apuesta, as.vector(unlist(metadata_apuesta[1])))
+      set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
+    }
+      
+    if ((sum(below_maxdraws)==6 )| k > 1000){
+      index <- match(diff_ap, set_apuesta$diff)
+      mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
+      bet <- sort(mat_apuesta[index,])
+      break
+    }
 }
+if(checkBetIsDistinct(bet)){break}
+}
+# cat("Apuesta", sep = "\n")
+# cat(bet, sep = "\n")
 
-cat("Apuesta", sep = "\n")
-cat(bet, sep = "\n")
+send_bet(bet)
+
+saveRDS(rep_2019, file = "rep2019.rds")
