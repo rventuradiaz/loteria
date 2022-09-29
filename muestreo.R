@@ -44,9 +44,15 @@
 
 library(stats)
 cPath <- getwd()
+source(paste(cPath,"/src/fnc_logger.R",sep = ""))
 source(paste(cPath,"/src/fnc_send_email.R",sep = ""))
 source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
 if(!exists("Findex")) Findex <- readRDS(file = "findexNumber.rds") 
+
+
+
+logFile <- file(get_log_file_name(), open = "at")
+sink(file = logFile, type = "message")
 
 
 Fibonacci <- function(N) {
@@ -88,7 +94,7 @@ is_unique <- function(x){
 }
 
 
-
+logit("Step: ","Leer sorteos anteriores")
 
 # Leer resultados del sorteo
 serie_numero<- read.table("sorteos.txt", 
@@ -150,6 +156,8 @@ saveRDS(Findex,file = "findexNumber.rds")
 FValue <- Fibonacci(Findex)
 seedvalue <- max(FValue)
 set.seed(seedvalue)
+
+logit("Step: ","Preparacion de datos")
 
 # Create an oversample of less frequent numbers
 total.repeticiones<-apply(as.matrix(serie_numero$Total), 2, sum)
@@ -326,6 +334,7 @@ sorteo_anyo_actual <- if(semana < 40 & anyo == 2022 ) {append(serie_sorteos.2021
 # sorteo_anyo_anterior <- if(semana < 40 & anyo == 2022) {serie_sorteos.2020} else {serie_sorteos.2021}
 sorteo_anyo_anterior <-serie_sorteos
 
+logit("Step: ","Generar poblacion")
 #Lottery follows a uniform distribution
 T=1e4;N=2000; M=100
 vales=matrix(0,N,6) # Now, we define a matrix with six columns
@@ -398,7 +407,7 @@ for (i in 1:N){
 source("function_avg_timesInRaw.R")
 source(paste(cPath,"/src/fnc_check_bet.R",sep = ""))
 
-
+logit("Step: ","generar apuesta")
 # undebug(avg_timesInRaw)
 k <- 0
 set_apuesta <- list()
@@ -464,6 +473,14 @@ if(checkBetIsDistinct(bet)){break}
 # cat("Apuesta", sep = "\n")
 # cat(bet, sep = "\n")
 
+logit("Step: ","Enviar apuestas a Trello")
+
 send_bet(bet)
 
+logit("Step: ","Guardar datos sorteos anteriores")
+
 saveRDS(rep_2019, file = "rep2019.rds")
+
+## reset message sink and close the file connection
+sink(type="message")
+close(logFile)
