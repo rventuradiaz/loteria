@@ -1,4 +1,4 @@
-send_bet <- function(bet){
+send_bet <- function(bet,subject){
 require(RDCOMClient)
 body_ <- "Apuesta: \n"
 for (i in bet){
@@ -11,7 +11,7 @@ OutApp <- COMCreate("Outlook.Application")
 outMail = OutApp$CreateItem(0)
 ## configure  email parameter 
 outMail[["To"]] = "rventura1+dscvxxwdjvfkm2z40yde@boards.trello.com"
-outMail[["subject"]] = "TOMORROW 08:00 - APUESTA PRIMITIVA"
+outMail[["subject"]] = subject
 outMail[["body"]] = body_
 # outMail[["SentOnBehalfOfName"]] = from_
 ## send it                     

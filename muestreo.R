@@ -407,6 +407,11 @@ for (i in 1:N){
 source("function_avg_timesInRaw.R")
 source(paste(cPath,"/src/fnc_check_bet.R",sep = ""))
 
+for (j in c(1:3))
+{
+  
+
+
 logit("Step: ","generar apuesta")
 # undebug(avg_timesInRaw)
 k <- 0
@@ -475,7 +480,11 @@ if(checkBetIsDistinct(bet)){break}
 
 logit("Step: ","Enviar apuestas a Trello")
 
-send_bet(bet)
+
+subject <- switch(j, "NEXT MONDAY 08:00 - APUESTA PRIMITIVA", "NEXT THURSDAY 08:00 - APUESTA PRIMITIVA", "NEXT SATURDAY 08:00 - APUESTA PRIMITIVA")
+
+send_bet(bet, subject)
+}
 
 logit("Step: ","Guardar datos sorteos anteriores")
 
