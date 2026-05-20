@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 scrape_user_inetum.js
+rep2019.rds
+sorteoAnterior.rds
+findexNumber.rds
+sorteos-anteriores.rds
+node_modules/
