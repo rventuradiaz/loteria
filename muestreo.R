@@ -43,9 +43,9 @@
 
 
 library(stats)
+setwd("D:/Dropbox/R/projects/loteria")
 cPath <- getwd()
 source(paste(cPath,"/src/fnc_logger.R",sep = ""))
-source(paste(cPath,"/src/fnc_send_email.R",sep = ""))
 source("loteria_sorteos_estadisticas.R") # Obtiene los sorteos de la web de loterias y genera el fichero sorteos.txt
 if(!exists("Findex")) Findex <- readRDS(file = "findexNumber.rds") 
 
@@ -159,180 +159,104 @@ set.seed(seedvalue)
 
 logit("Step: ","Preparacion de datos")
 
-# Create an oversample of less frequent numbers
-total.repeticiones<-apply(as.matrix(serie_numero$Total), 2, sum)
-total.2016.repeticiones<-apply(as.matrix(serie_numero$year.2016), 2, sum)
-total.2017.repeticiones<-apply(as.matrix(serie_numero$year.2017), 2, sum) # v6.0
-total.2018.repeticiones<-apply(as.matrix(serie_numero$year.2018), 2, sum) # v6.0
-total.2019.repeticiones<-apply(as.matrix(serie_numero$year.2019), 2, sum) # v6.0
-total.2020.repeticiones<-apply(as.matrix(serie_numero$year.2020), 2, sum) # v6.0
-total.2021.repeticiones<-apply(as.matrix(serie_numero$year.2021), 2, sum) # v6.0
-total.2022.repeticiones<-apply(as.matrix(serie_numero$year.2022), 2, sum) # v6.0
+# ---- Rolling window: last 5 years from today ----
+# seq() produces a vector of integers from (current_year - 4) up to current_year,
+# giving exactly 5 values — e.g. in 2026: c(2022, 2023, 2024, 2025, 2026).
+current_year <- as.integer(format(Sys.Date(), "%Y"))
+window_years <- seq(current_year - 4, current_year)
 
-serie_numero["perc.total"]<-NA
-serie_numero["perc.total.2016"]<-NA
-serie_numero["perc.total.2017"]<-NA
-serie_numero["perc.total.2018"]<-NA
-serie_numero["perc.total.2019"]<-NA
-serie_numero["perc.total.2020"]<-NA
-serie_numero["perc.total.2021"]<-NA
-serie_numero["perc.total.2022"]<-NA
-serie_numero[,"perc.total"]<-serie_numero[,"Total"]/total.repeticiones
-serie_numero[,"perc.total.2016"]<-serie_numero[,"year.2016"]/total.2016.repeticiones
-serie_numero[,"perc.total.2017"]<-serie_numero[,"year.2017"]/total.2017.repeticiones
-serie_numero[,"perc.total.2018"]<-serie_numero[,"year.2018"]/total.2018.repeticiones
-serie_numero[,"perc.total.2019"]<-serie_numero[,"year.2019"]/total.2019.repeticiones
-serie_numero[,"perc.total.2020"]<-serie_numero[,"year.2020"]/total.2020.repeticiones
-serie_numero[,"perc.total.2021"]<-serie_numero[,"year.2021"]/total.2021.repeticiones
-serie_numero[,"perc.total.2022"]<-serie_numero[,"year.2022"]/total.2022.repeticiones
-serie_numero["over.sampling"]<-NA
-
-median.serienum<-median(serie_numero$perc.total)
-
-q.serienum <-quantile(serie_numero$perc.total)
-serie_numero["over.sampling.2016"]<-1
-serie_numero[serie_numero$perc.total>q.serienum[[4]],"over.sampling"]<-5
-serie_numero[is.na(serie_numero$over.sampling)&(serie_numero$perc.total>q.serienum[[3]]),"over.sampling"]<-3
-serie_numero[is.na(serie_numero$over.sampling)&(serie_numero$perc.total>q.serienum[[2]]),"over.sampling"]<-2
-serie_numero[is.na(serie_numero$over.sampling),"over.sampling"]<-1
-
-
-q.serienum2016 <-quantile(serie_numero$perc.total.2016)
-serie_numero[serie_numero$perc.total.2016>q.serienum2016[[4]],"over.sampling.2016"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2016)&(serie_numero$perc.total.2016>q.serienum2016[[3]]),"over.sampling.2016"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2016)&(serie_numero$perc.total.2016>q.serienum2016[[2]]),"over.sampling.2016"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2016),"over.sampling.2016"]<-1
-
-# serie_numero["over.sampling.2017"]<-NA
-q.serienum2017 <-quantile(serie_numero$perc.total.2017)
-q.serienum2018 <-quantile(serie_numero$perc.total.2018)
-q.serienum2019 <-quantile(serie_numero$perc.total.2019)
-q.serienum2020 <-quantile(serie_numero$perc.total.2020)
-q.serienum2021 <-quantile(serie_numero$perc.total.2021)
-q.serienum2022 <-quantile(serie_numero$perc.total.2022)
-
-serie_numero[,"over.sampling.2017"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>=q.serienum2017[[1]]),"over.sampling.2017"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>q.serienum2017[[2]]),"over.sampling.2017"]<-2
-serie_numero[is.na(serie_numero$over.sampling.2017)&(serie_numero$perc.total.2017>q.serienum2017[[3]]),"over.sampling.2017"]<-3
-serie_numero[serie_numero$perc.total.2017>q.serienum2017[[4]],"over.sampling.2017"]<-5
-
-serie_numero[,"over.sampling.2018"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>=q.serienum2018[[1]]),"over.sampling.2018"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[2]]),"over.sampling.2018"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2018)&(serie_numero$perc.total.2018>q.serienum2018[[3]]),"over.sampling.2018"]<-1
-serie_numero[serie_numero$perc.total.2018>q.serienum2018[[4]],"over.sampling.2018"]<-1
-
-serie_numero[,"over.sampling.2019"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>=q.serienum2019[[1]]),"over.sampling.2019"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[2]]),"over.sampling.2019"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2019)&(serie_numero$perc.total.2019>q.serienum2019[[3]]),"over.sampling.2019"]<-1
-serie_numero[serie_numero$perc.total.2019>q.serienum2019[[4]],"over.sampling.2019"]<-1
-
-serie_numero[,"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>=q.serienum2020[[1]]),"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[2]]),"over.sampling.2020"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2020)&(serie_numero$perc.total.2020>q.serienum2020[[3]]),"over.sampling.2020"]<-1
-serie_numero[serie_numero$perc.total.2020>q.serienum2020[[4]],"over.sampling.2019"]<-1
-
-serie_numero[,"over.sampling.2021"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>=q.serienum2021[[1]]),"over.sampling.2021"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>q.serienum2021[[2]]),"over.sampling.2021"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2021)&(serie_numero$perc.total.2021>q.serienum2021[[3]]),"over.sampling.2021"]<-1
-serie_numero[serie_numero$perc.total.2021>q.serienum2020[[4]],"over.sampling.2021"]<-1
-
-serie_numero[,"over.sampling.2022"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2021>=q.serienum2022[[1]]),"over.sampling.2022"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2022>q.serienum2022[[2]]),"over.sampling.2022"]<-1
-serie_numero[is.na(serie_numero$over.sampling.2022)&(serie_numero$perc.total.2022>q.serienum2022[[3]]),"over.sampling.2022"]<-1
-serie_numero[serie_numero$perc.total.2022>q.serienum2022[[4]],"over.sampling.2022"]<-1
-
-# table(serie_numero$over.sampling.2016)
-
-# We transform the matrix to obtain six columns
-serie_sorteos <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"Total"]*serie_numero[1,"over.sampling"]))
-for (i in 2:49){
-  serie_sorteos <- append(serie_sorteos, 
-                          rep(serie_numero[i, "Numero"], 
-                              serie_numero[i,"Total"]*serie_numero[i,"over.sampling"]) ) 
+# ---- Step 1: totals per year ----
+# Instead of one variable per year (total.2022.repeticiones, etc.) we use a named list.
+# A list in R can hold any type of value and each element can be accessed by a string key.
+# paste0("year.", yr) builds the column name dynamically, e.g. "year.2022".
+# [[yr_str]] stores or retrieves the element whose key is the year string.
+total_rep_by_year <- list()
+for (yr in window_years) {
+  yr_str <- as.character(yr)
+  col    <- paste0("year.", yr)
+  total_rep_by_year[[yr_str]] <- apply(as.matrix(serie_numero[[col]]), 2, sum)
 }
 
-# v6,6,0: Crear todos los sorteos anteriores
-lastYear <- format(Sys.Date(),"%Y")
+# ---- Step 2: all-time totals and oversampling (unchanged) ----
+total.repeticiones <- apply(as.matrix(serie_numero$Total), 2, sum)
+serie_numero["perc.total"] <- NA
+serie_numero[, "perc.total"] <- serie_numero[, "Total"] / total.repeticiones
+serie_numero["over.sampling"] <- NA
 
+median.serienum <- median(serie_numero$perc.total)
+q.serienum <- quantile(serie_numero$perc.total)
 
-serie_sorteos.2016 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2016"]*serie_numero[1,"over.sampling.2016"]))
-for (i in 2:49){
-  serie_sorteos.2016 <- append(serie_sorteos.2016, 
-                          rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2016"]*serie_numero[i,"over.sampling.2016"])))  
+serie_numero[serie_numero$perc.total > q.serienum[[4]], "over.sampling"] <- 5
+serie_numero[is.na(serie_numero$over.sampling) & (serie_numero$perc.total > q.serienum[[3]]), "over.sampling"] <- 3
+serie_numero[is.na(serie_numero$over.sampling) & (serie_numero$perc.total > q.serienum[[2]]), "over.sampling"] <- 2
+serie_numero[is.na(serie_numero$over.sampling), "over.sampling"] <- 1
+
+# ---- Step 3: per-year frequency percentages ----
+# We loop over the window instead of repeating the same lines for each year.
+# serie_numero[[col]] lets us use a variable as a column name — $ does not allow this.
+for (yr in window_years) {
+  yr_str   <- as.character(yr)
+  year_col <- paste0("year.", yr)
+  perc_col <- paste0("perc.total.", yr)
+  serie_numero[perc_col] <- NA
+  serie_numero[, perc_col] <- serie_numero[[year_col]] / total_rep_by_year[[yr_str]]
 }
 
-serie_sorteos.2017 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2017"]*serie_numero[1,"over.sampling.2017"]))
-for (i in 2:49){
-  serie_sorteos.2017 <- append(serie_sorteos.2017, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2017"]*serie_numero[i,"over.sampling.2017"])))  
+# ---- Step 4: per-year oversampling weights ----
+# Numbers that appeared more than expected (top quartile) are oversampled 5x,
+# then 3x, then 2x, and everything else stays at 1x.
+for (yr in window_years) {
+  os_col   <- paste0("over.sampling.", yr)
+  perc_col <- paste0("perc.total.", yr)
+  q <- quantile(serie_numero[[perc_col]])
+
+  serie_numero[, os_col] <- 1
+  serie_numero[serie_numero[[perc_col]] > q[[4]], os_col] <- 5
+  serie_numero[serie_numero[[perc_col]] > q[[3]] & serie_numero[[perc_col]] <= q[[4]], os_col] <- 3
+  serie_numero[serie_numero[[perc_col]] > q[[2]] & serie_numero[[perc_col]] <= q[[3]], os_col] <- 2
 }
 
-serie_sorteos.2018 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2018"]*serie_numero[1,"over.sampling.2018"]))
-for (i in 2:49){
-  serie_sorteos.2018 <- append(serie_sorteos.2018, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2018"]*serie_numero[i,"over.sampling.2018"])))  
+# ---- Step 5: all-time sampling series (used as the global pool in the loop below) ----
+serie_sorteos <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1, "Total"] * serie_numero[1, "over.sampling"]))
+for (i in 2:49) {
+  serie_sorteos <- append(serie_sorteos,
+                          rep(serie_numero[i, "Numero"],
+                              serie_numero[i, "Total"] * serie_numero[i, "over.sampling"]))
 }
 
-serie_sorteos.2019 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2019"]*serie_numero[1,"over.sampling.2019"]))
-for (i in 2:49){
-  serie_sorteos.2019 <- append(serie_sorteos.2019, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2019"]*serie_numero[i,"over.sampling.2019"])))  
+# ---- Step 6: per-year sampling series stored in a named list ----
+# serie_sorteos_by_year[["2024"]] replaces what used to be the variable serie_sorteos.2024.
+# Each element is a vector where every lottery number appears as many times as it was
+# drawn that year, scaled by its oversampling weight.
+serie_sorteos_by_year <- list()
+for (yr in window_years) {
+  yr_str   <- as.character(yr)
+  year_col <- paste0("year.", yr)
+  os_col   <- paste0("over.sampling.", yr)
+
+  sv <- rep(serie_numero[1, "Numero"],
+            as.integer(serie_numero[1, year_col] * serie_numero[1, os_col]))
+  for (i in 2:49) {
+    sv <- append(sv, rep(serie_numero[i, "Numero"],
+                         as.integer(serie_numero[i, year_col] * serie_numero[i, os_col])))
+  }
+  serie_sorteos_by_year[[yr_str]] <- sv
 }
 
-serie_sorteos.2020 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2020"]*serie_numero[1,"over.sampling.2020"]))
-for (i in 2:49){
-  serie_sorteos.2020 <- append(serie_sorteos.2020, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2020"]*serie_numero[i,"over.sampling.2020"])))  
-}
-
-serie_sorteos.2021 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2021"]*serie_numero[1,"over.sampling.2021"]))
-for (i in 2:49){
-  serie_sorteos.2021 <- append(serie_sorteos.2021, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2021"]*serie_numero[i,"over.sampling.2021"])))  
-}
-
-serie_sorteos.2022 <- rep(serie_numero[1, "Numero"], as.integer(serie_numero[1,"year.2022"]*serie_numero[1,"over.sampling.2022"]))
-for (i in 2:49){
-  serie_sorteos.2022 <- append(serie_sorteos.2022, 
-                               rep(serie_numero[i, "Numero"], as.integer(serie_numero[i,"year.2022"]*serie_numero[i,"over.sampling.2022"])))  
-}
-
-# Calculate vector of quantiles as lottery follows a uniform distribution
-par(mfcol=c(2,4), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
-# par(mfcol=c(1,1), oma=c(1,1,0,0), mar=c(1,1,1,0), tcl=-0.1, mgp=c(0,0,0))
-
-
-
-# hist(serie_sorteos, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','todos')
-#      ,cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2016, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2016'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2017, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2017'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2018, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2018'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2019, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2019'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2020, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2020'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2021, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2021'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# hist(serie_sorteos.2022, breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','2022'), 
-#      cex.axis=0.5, font.main=1, cex.main=0.8)
-# 
-
-# OJO: Cambiar conforme cambie el año
-anyo <- as.integer(strftime(Sys.Date(), format = "%Y"))
+# ---- Step 7: current and previous year sampling pools ----
+# as.character(current_year) converts 2026 → "2026" so it matches the list key.
+# If we are early in the year (week < 40) we blend current and previous year data.
+anyo   <- current_year
 semana <- as.integer(strftime(Sys.Date(), format = "%V"))
-sorteo_anyo_actual <- if(semana < 40 & anyo == 2022 ) {append(serie_sorteos.2021, serie_sorteos.2020)} else {serie_sorteos.2022}
-# sorteo_anyo_anterior <- if(semana < 40 & anyo == 2022) {serie_sorteos.2020} else {serie_sorteos.2021}
-sorteo_anyo_anterior <-serie_sorteos
+yr_now  <- as.character(anyo)
+yr_prev <- as.character(anyo - 1)
+
+sorteo_anyo_actual <- if (semana < 40) {
+  append(serie_sorteos_by_year[[yr_now]], serie_sorteos_by_year[[yr_prev]])
+} else {
+  serie_sorteos_by_year[[yr_now]]
+}
+sorteo_anyo_anterior <- serie_sorteos
 
 logit("Step: ","Generar poblacion")
 #Lottery follows a uniform distribution
@@ -406,11 +330,10 @@ for (i in 1:N){
 
 source("function_avg_timesInRaw.R")
 source(paste(cPath,"/src/fnc_check_bet.R",sep = ""))
+source(paste(cPath,"/src/fnc_send_email.R",sep = ""))
 
 for (j in c(1:3))
 {
-  
-
 
 logit("Step: ","generar apuesta")
 # undebug(avg_timesInRaw)
@@ -483,7 +406,8 @@ logit("Step: ","Enviar apuestas a Trello")
 
 subject <- switch(j, "NEXT MONDAY 08:00 - APUESTA PRIMITIVA", "NEXT THURSDAY 08:00 - APUESTA PRIMITIVA", "NEXT SATURDAY 08:00 - APUESTA PRIMITIVA")
 
-send_bet(bet, subject)
+# debug(send_bet_gmail)
+send_bet_gmail(bet, subject)
 }
 
 logit("Step: ","Guardar datos sorteos anteriores")
