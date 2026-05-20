@@ -162,8 +162,11 @@ logit("Step: ","Preparacion de datos")
 # ---- Rolling window: last 5 years from today ----
 # seq() produces a vector of integers from (current_year - 4) up to current_year,
 # giving exactly 5 values — e.g. in 2026: c(2022, 2023, 2024, 2025, 2026).
-current_year <- as.integer(format(Sys.Date(), "%Y"))
-window_years <- seq(current_year - 4, current_year)
+# intersect() then clamps to only years that actually have a column in the data,
+# so the script stays safe even when the scraper hasn't fetched the latest year yet.
+current_year  <- as.integer(format(Sys.Date(), "%Y"))
+available_years <- as.integer(sub("year\\.", "", grep("^year\\.", names(serie_numero), value = TRUE)))
+window_years  <- sort(intersect(seq(current_year - 4, current_year), available_years))
 
 # ---- Step 1: totals per year ----
 # Instead of one variable per year (total.2022.repeticiones, etc.) we use a named list.
@@ -244,14 +247,13 @@ for (yr in window_years) {
 }
 
 # ---- Step 7: current and previous year sampling pools ----
-# as.character(current_year) converts 2026 → "2026" so it matches the list key.
-# If we are early in the year (week < 40) we blend current and previous year data.
-anyo   <- current_year
-semana <- as.integer(strftime(Sys.Date(), format = "%V"))
-yr_now  <- as.character(anyo)
-yr_prev <- as.character(anyo - 1)
+# Use the most recent year present in window_years, not the calendar year,
+# so this works even when the scraper data lags behind the current date.
+semana  <- as.integer(strftime(Sys.Date(), format = "%V"))
+yr_now  <- as.character(max(window_years))
+yr_prev <- as.character(max(window_years) - 1)
 
-sorteo_anyo_actual <- if (semana < 40) {
+sorteo_anyo_actual <- if (semana < 40 && yr_prev %in% names(serie_sorteos_by_year)) {
   append(serie_sorteos_by_year[[yr_now]], serie_sorteos_by_year[[yr_prev]])
 } else {
   serie_sorteos_by_year[[yr_now]]
