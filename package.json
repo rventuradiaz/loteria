@@ -1,0 +1,26 @@
+{
+  "name": "loteria",
+  "version": "1.0.0",
+  "description": "",
+  "main": "probe_api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rventuradiaz/loteria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rventuradiaz/loteria/issues"
+  },
+  "homepage": "https://github.com/rventuradiaz/loteria#readme",
+  "dependencies": {
+    "puppeteer": "^25.0.4",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

@@ -11,7 +11,7 @@ if(!exists("sorteo_anterior")) {
 }
 
 # Let phantomJS scrape techstars, output is written to techstars.html
-system("./phantomjs scrape_loterias.js")
+system("node scrape_loterias.js")
 
 
 
