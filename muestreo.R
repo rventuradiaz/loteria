@@ -258,7 +258,12 @@ sorteo_anyo_actual <- if (semana < 40 && yr_prev %in% names(serie_sorteos_by_yea
 } else {
   serie_sorteos_by_year[[yr_now]]
 }
-sorteo_anyo_anterior <- serie_sorteos
+if (length(serie_sorteos_by_year[[yr_prev]])>0){
+  sorteo_anyo_anterior <- serie_sorteos_by_year[[yr_prev]]
+} else {
+  sorteo_anyo_anterior <- sorteos_anteriores
+}
+
 
 logit("Step: ","Generar poblacion")
 #Lottery follows a uniform distribution
@@ -329,10 +334,10 @@ for (i in 1:N){
 
 # hist(as.vector(vales),breaks = as.vector(seq(1,49,by=1)), xlab=NA, ylab=NA, main=paste('sorteo: ','muestra'), 
 #      cex.axis=0.5, font.main=1, cex.main=0.8)
-
-source("function_avg_timesInRaw.R")
+source(paste(cPath,"/src/function_avg_timesInRaw.R",sep = ""))
 source(paste(cPath,"/src/fnc_check_bet.R",sep = ""))
 source(paste(cPath,"/src/fnc_send_email.R",sep = ""))
+
 
 for (j in c(1:3))
 {
@@ -359,15 +364,25 @@ repeat {
       compo <- apuesta[i]
       metadata_apuesta$seleccion <- compo
       # Get the average time element appears in draw last year
-      rep_last_year <- avg_timesInRaw(x = compo, year = as.integer(strftime(Sys.Date(), format = "%Y"))-1 )
+      if (exists("sorteo_anyo_anterior", mode = "numeric") & length(sorteo_anyo_anterior)>0) {
+        rep_last_year <- avg_timesInRaw(x = compo, year = as.integer(strftime(Sys.Date(), format = "%Y"))-1, sorteo_anyo_anterior )
+      } else {
+        rep_last_year <- 0
+      }
       
-      if(!exists("rep_2019")) rep_2019 <- readRDS(file = "rep2019.rds")
+      
+      if(!exists("rep_2019",mode = "numeric")) rep_2019 <- readRDS(file = "rep2019.rds")
       
       metadata_apuesta$rep_2019 <- rep_2019
       
       
       # Get the average occurence an element appear in draw in current year
-      rep_current_year <- avg_timesInRaw( x = compo) 
+      if (exists("sorteo_anyo_actual", mode = "numeric") & length(sorteo_anyo_actual)> 0){
+        rep_current_year <- avg_timesInRaw( x = compo, current_year,sorteo_anyo_actual)   
+      } else {
+        rep_current_year <- 0
+      }
+      
       
       metadata_apuesta$rep_current_year <- rep_current_year
       
@@ -383,7 +398,6 @@ repeat {
       }
     }
     
-    k <- k+1
     
     if (length(is_unique(c(unlist(metadata_apuesta)[1:6])))==6)  {
       if((metadata_apuesta$difference < diff_ap) & (max(table(apuesta))==1) ) diff_ap <- metadata_apuesta$difference
@@ -391,12 +405,23 @@ repeat {
       set_apuesta$diff <- append(set_apuesta$diff, as.vector(unlist(metadata_apuesta[5])))
     }
       
-    if ((sum(below_maxdraws)==6 )| k > 1000){
+    if ((sum(below_maxdraws)==6 )){
       index <- match(diff_ap, set_apuesta$diff)
       mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
       bet <- sort(mat_apuesta[index,])
+      logit("Bet: ",cat(bet))
       break
     }
+    
+    if (k > 100){
+      index <- match(diff_ap, set_apuesta$diff)
+      mat_apuesta <- matrix(ncol= 6, set_apuesta$apuesta, byrow = FALSE)
+      bet <- sort(mat_apuesta[index,])
+      logit("Bet: ",cat(bet))
+      break
+    }
+    
+    k <- k+1
 }
 if(checkBetIsDistinct(bet)){break}
 }
